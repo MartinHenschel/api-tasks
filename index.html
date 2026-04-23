@@ -43,10 +43,6 @@ button {
     margin-top: 5px;
 }
 
-button:hover {
-    opacity: 0.9;
-}
-
 .login-btn {
     background: #007bff;
     color: white;
@@ -93,7 +89,6 @@ li button {
 <!-- LOGIN -->
 <div id="loginBox">
     <h2>Login</h2>
-
     <input id="user" placeholder="Usuário">
     <input id="pass" type="password" placeholder="Senha">
     <button class="login-btn" onclick="login()">Login</button>
@@ -103,22 +98,18 @@ li button {
 
 <!-- TAREFAS -->
 <div id="appBox">
-
     <h2>Tarefas</h2>
-
     <input id="task" placeholder="Nova tarefa">
     <button class="add-btn" onclick="add()">Adicionar</button>
-
     <ul id="list"></ul>
-
     <button class="logout-btn" onclick="logout()">Sair</button>
-
 </div>
 
 </div>
 
 <script>
 
+const API = "https://api-tasks-2.onrender.com";
 let token = localStorage.getItem("token") || "";
 
 // MOSTRAR / ESCONDER LOGIN
@@ -129,37 +120,26 @@ function toggleLogin(show) {
 
 // LOGIN
 function login() {
-    fetch("https://api-tasks-2.onrender.com"), {
+    fetch(API + "/login", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
             username: document.getElementById("user").value,
             password: document.getElementById("pass").value
         })
-    }
+    })
     .then(r => {
         if (!r.ok) throw new Error("Login inválido");
         return r.json();
     })
     .then(data => {
         token = data.access_token;
-
         localStorage.setItem("token", token);
-        localStorage.setItem("username", data.username);
 
         toggleLogin(false);
-        showUser();
         getTasks();
     })
     .catch(err => alert(err.message));
-}
-
-// MOSTRAR USUÁRIO
-function showUser() {
-    const username = localStorage.getItem("username");
-    if (username) {
-        document.getElementById("userName").innerText = "Logado como: " + username;
-    }
 }
 
 // ADICIONAR
@@ -171,7 +151,7 @@ function add() {
         return;
     }
 
-    fetch("http://127.0.0.1:5000/tasks", {
+    fetch(API + "/tasks", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -192,7 +172,7 @@ function add() {
 
 // LISTAR
 function getTasks() {
-    fetch("http://127.0.0.1:5000/tasks", {
+    fetch(API + "/tasks", {
         headers: {
             "Authorization": "Bearer " + token
         }
@@ -233,7 +213,7 @@ function getTasks() {
 function deleteTask(id) {
     if (!confirm("Deseja deletar?")) return;
 
-    fetch("http://127.0.0.1:5000/tasks/" + id, {
+    fetch(API + "/tasks/" + id, {
         method: "DELETE",
         headers: {
             "Authorization": "Bearer " + token
@@ -249,9 +229,7 @@ function deleteTask(id) {
 // LOGOUT
 function logout() {
     localStorage.removeItem("token");
-    localStorage.removeItem("username");
     token = "";
-
     toggleLogin(true);
     location.reload();
 }
@@ -259,7 +237,6 @@ function logout() {
 // AUTO LOGIN
 if (token) {
     toggleLogin(false);
-    showUser();
     getTasks();
 } else {
     toggleLogin(true);
