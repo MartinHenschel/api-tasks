@@ -96,7 +96,7 @@ Após o login, o token é armazenado no navegador e enviado nas requisições.
 
 ## 📷 Demonstração
 
-*(adicione aqui um print do sistema depois)*
+
 ![alt text](image.png)
 ---
 
